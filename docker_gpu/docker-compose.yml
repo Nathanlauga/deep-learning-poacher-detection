@@ -2,13 +2,26 @@ version: '2.3'
 
 services:
   tensorflow:
-    build: .
+    build: 
+      context: ./tensorflow-gpu
     runtime: nvidia
+    depends_on: 
+      - mlflow
     environment:
       - NVIDIA_VISIBLE_DEVICES=0
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
     ports:
       - 8888:8888
       - 6006:6006
     volumes:
       - ../notebooks:/tf
       - ../data:/data
+  mlflow:
+    build:
+      context: ./ml-flow-docker
+    expose: 
+      - "5000"
+    ports:
+      - "5000:5000"
+    volumes:
+      - ../mlflow:/mlflow
