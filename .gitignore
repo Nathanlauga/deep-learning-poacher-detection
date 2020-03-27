@@ -133,3 +133,4 @@ data/
 notebooks/frames/
 mlflow/
 .vscode/
+notebooks/object-detection-opencv/yolov3.weights
