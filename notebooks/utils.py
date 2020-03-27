@@ -141,8 +141,8 @@ def get_files_by_ext(dir_name, ext=['txt']):
         path = os.path.join(dir_name, entry)
         
         if os.path.isdir(path):
-            files += get_files_by_ext(path)
-        else:
+            files += get_files_by_ext(path, ext=ext)
+        elif path.split('.')[-1] in ext:
             files.append(path)
 
     return files
