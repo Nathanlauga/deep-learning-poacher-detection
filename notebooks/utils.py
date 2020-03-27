@@ -141,8 +141,8 @@ def get_files_by_ext(dir_name, ext=['txt']):
         path = os.path.join(dir_name, entry)
         
         if os.path.isdir(path):
-            files += get_files_by_ext(path)
-        else:
+            files += get_files_by_ext(path, ext=ext)
+        elif path.split('.')[-1] in ext:
             files.append(path)
 
     return files
@@ -166,14 +166,15 @@ def image_to_matrix(path, resize_shape=(416,416)):
     scale = (1 / 255)
     
     if type(path) == list:
-        images = [cv2.resize(cv2.imread(p), resize_shape) for p in path]
+        # images = [cv2.resize(cv2.imread(p), resize_shape) for p in path]
+        images = [cv2.imread(p) for p in path]
         blob = cv2.dnn.blobFromImages(images, scale, resize_shape, 
                                      (0,0,0), True, crop=False)
         
     else:
         image = cv2.imread(path)
-        resized = cv2.resize(image, resize_shape)
-        blob = cv2.dnn.blobFromImage(resized, scale, resize_shape, 
+        # image = cv2.resize(image, resize_shape)
+        blob = cv2.dnn.blobFromImage(image, scale, resize_shape, 
                                      (0,0,0), True, crop=False)
     return blob    
 
