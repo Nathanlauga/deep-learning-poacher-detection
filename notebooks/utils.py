@@ -195,3 +195,73 @@ def plot_image(image):
     fig = plt.figure(figsize=(7,7))
     plt.imshow(image)
     plt.show()
+
+    
+def detect_object(outs, list_images, Width, Height):
+    import numpy as np
+    
+    i = 0
+    dict_obj_detected = {}
+
+    # for each detetion from each output layer 
+    # get the confidence, class id, bounding box params
+    # and ignore weak detections (confidence < 0.5)
+    for out in outs:
+        for image in out:
+            image_name = list_images[i]
+            if not image_name in dict_obj_detected:
+                dict_obj_detected[image_name] = {}
+                dict_obj_detected[image_name]["class_ids"] = list()
+                dict_obj_detected[image_name]["confidences"] = list()
+                dict_obj_detected[image_name]["boxes"] = list()
+            for detection in image:
+                scores = detection[5:]
+                class_id = np.argmax(scores)
+                confidence = scores[class_id]
+                if confidence > 0.5:
+                    center_x = int(detection[0] * Width[i])
+                    center_y = int(detection[1] * Height[i])
+                    w = int(detection[2] * Width[i])
+                    h = int(detection[3] * Height[i])
+                    x = center_x - w / 2
+                    y = center_y - h / 2
+                    dict_obj_detected[image_name]["class_ids"].append(class_id)
+                    dict_obj_detected[image_name]["confidences"].append(float(confidence))
+                    dict_obj_detected[image_name]["boxes"].append([x, y, w, h])
+            i += 1
+        i = 0 
+
+    return dict_obj_detected
+
+def detect_danger(dict_obj_detected, idx_class=0):
+    
+    dict_image_danger = {}
+    
+    for image_name, row in dict_obj_detected.items():
+        if len(row["class_ids"]) != 0 and idx_class in row["class_ids"]: 
+            dict_image_danger[image_name] = True
+        else:
+            dict_image_danger[image_name] = False
+    
+    return dict_image_danger
+
+# function to get the output layer names 
+# in the architecture
+def get_output_layers(net):
+    
+    layer_names = net.getLayerNames()
+    
+    output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
+
+    return output_layers
+
+# function to draw bounding box on the detected object with class name
+def draw_bounding_box(img, class_id, confidence, x, y, x_plus_w, y_plus_h):
+
+    label = str(classes[class_id])
+
+    color = COLORS[class_id]
+
+    cv2.rectangle(img, (x,y), (x_plus_w,y_plus_h), color, 2)
+
+    cv2.putText(img, label, (x-10,y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
