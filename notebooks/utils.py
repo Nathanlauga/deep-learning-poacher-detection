@@ -1,6 +1,7 @@
 import cv2
 import os
 
+import matplotlib.pyplot as plt
 
 def extract_frames(file, out_dir='frames', save=False, skip=30):
     """Extract frames from a video file.
@@ -115,3 +116,81 @@ def regroup_frames_same_dir(parent_dir, out_dir='/data/train'):
     files_list = os.listdir(out_dir)
     print('There are %i frames moved to `%s` directory.' %
           (len(files_list), out_dir))
+
+
+def get_files_by_ext(dir_name, ext=['txt']):
+    """Retrieves all files from a directory
+    using extension list
+
+    Parameters
+    ----------
+    dir_name: str
+        Path of the directory
+    ext: list
+        list of valid extensions
+    
+    Returns
+    -------
+    list:
+        files list
+    """
+    files_list = os.listdir(dir_name)
+    files = list()
+    
+    for entry in files_list:
+        path = os.path.join(dir_name, entry)
+        
+        if os.path.isdir(path):
+            files += get_files_by_ext(path)
+        else:
+            files.append(path)
+
+    return files
+
+def image_to_matrix(path, resize_shape=(416,416)):
+    """
+    Convert an image (using path) to a numpy array 
+    
+    Parameters
+    ----------
+    path: str or list
+        Path(s) to the image(s) to convert
+    resize_shape: tuple (default (416,416))
+        Size for the matrix (default for Yolov3 model)
+    
+    Returns
+    -------
+    np.array
+        matrix with shape (3,h,w)
+    """
+    scale = (1 / 255)
+    
+    if type(path) == list:
+        images = [cv2.resize(cv2.imread(p), resize_shape) for p in path]
+        blob = cv2.dnn.blobFromImages(images, scale, resize_shape, 
+                                     (0,0,0), True, crop=False)
+        
+    else:
+        image = cv2.imread(path)
+        resized = cv2.resize(image, resize_shape)
+        blob = cv2.dnn.blobFromImage(resized, scale, resize_shape, 
+                                     (0,0,0), True, crop=False)
+    return blob    
+
+
+def plot_image(image):
+    """Plots the image.
+    
+    Parameters
+    ----------
+    image: np.array
+        Matrix of the image with (3,h,w) shape
+    """
+    if len(image.shape) == 4:
+        image = image.reshape(image.shape[1:])
+    
+    image = image.transpose((1,2,0))
+    
+    fig = plt.figure(figsize=(7,7))
+    plt.imshow(image)
+    plt.show()
