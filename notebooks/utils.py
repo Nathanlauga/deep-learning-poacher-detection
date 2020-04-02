@@ -1,5 +1,6 @@
 import cv2
 import os
+import numpy as np
 
 import matplotlib.pyplot as plt
 
@@ -197,9 +198,7 @@ def plot_image(image):
     plt.show()
 
     
-def detect_object(outs, list_images, Width, Height):
-    import numpy as np
-    
+def detect_object(outs, list_images, Width, Height):    
     i = 0
     dict_obj_detected = {}
 

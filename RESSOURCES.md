@@ -9,3 +9,4 @@ Ressources for the project
 | MLFlow code example | [link](https://github.com/mlflow/mlflow/blob/master/examples/tensorflow/tf2/train_predict_2.py) |
 | Understanding YOLO | [link](https://hackernoon.com/understanding-yolo-f5a74bbc7967) |
 | YOLO Paper (Arxiv) | [link](https://arxiv.org/pdf/1506.02640.pdf) |
+| YOLOv3 with Keras code | [link](https://github.com/YunYang1994/TensorFlow2.0-Examples/blob/master/4-Object_Detection/YOLOV3/) |
