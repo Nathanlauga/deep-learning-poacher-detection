@@ -1,8 +1,14 @@
 import cv2
 import os
+<<<<<<< HEAD
 import numpy as np
+=======
+from os.path import isfile, join
+from tqdm import tqdm
+>>>>>>> 0c25fbd05056183d74a134bb38af0ab33ef2865f
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 def extract_frames(file, out_dir='frames', save=False, skip=30):
     """Extract frames from a video file.
@@ -25,8 +31,9 @@ def extract_frames(file, out_dir='frames', save=False, skip=30):
     success, image = video.read()
     while success:
         if save & (count % skip == 0):
-            cv2.imwrite("%s/%s_frame%d.jpg" % (out_dir, fname, count), image)
-
+            countFormated = "{0:0=5d}".format(count)
+            cv2.imwrite("%s/%s_frame%s.jpg" % (out_dir, fname, countFormated), image)
+            
         success, image = video.read()
         count += 1
 
@@ -34,7 +41,29 @@ def extract_frames(file, out_dir='frames', save=False, skip=30):
 
     video.release()
 
-
+def convert_frames_to_video(pathIn,pathOut,fps):
+    frame_array = []
+    files = [f for f in os.listdir(pathIn) if isfile(join(pathIn, f))]
+ 
+    #for sorting the file names properly
+    files.sort(key = lambda x: x[5:-4])
+ 
+    for i in tqdm(range(len(files))):
+        filename=pathIn + files[i]
+        #reading each files
+        img = cv2.imread(filename)
+        height, width, layers = img.shape
+        size = (width,height)
+        #inserting the frames into an image array
+        frame_array.append(img)
+ 
+    out = cv2.VideoWriter(pathOut,cv2.VideoWriter_fourcc(*'DIVX'), fps, size)
+ 
+    for i in tqdm(range(len(frame_array))):
+        # writing to a image array
+        out.write(frame_array[i])
+    out.release()
+    
 def move_file(file, new_file):
     """Moves a file to a new directory
 
@@ -198,7 +227,12 @@ def plot_image(image):
     plt.show()
 
     
+<<<<<<< HEAD
 def detect_object(outs, list_images, Width, Height):    
+=======
+def detect_object(outs, list_images, Width, Height):
+    
+>>>>>>> 0c25fbd05056183d74a134bb38af0ab33ef2865f
     i = 0
     dict_obj_detected = {}
 
@@ -218,10 +252,10 @@ def detect_object(outs, list_images, Width, Height):
                 class_id = np.argmax(scores)
                 confidence = scores[class_id]
                 if confidence > 0.5:
-                    center_x = int(detection[0] * Width[i])
-                    center_y = int(detection[1] * Height[i])
-                    w = int(detection[2] * Width[i])
-                    h = int(detection[3] * Height[i])
+                    center_x = int(detection[0] * Width)
+                    center_y = int(detection[1] * Height)
+                    w = int(detection[2] * Width)
+                    h = int(detection[3] * Height)
                     x = center_x - w / 2
                     y = center_y - h / 2
                     dict_obj_detected[image_name]["class_ids"].append(class_id)
@@ -244,6 +278,34 @@ def detect_danger(dict_obj_detected, idx_class=0):
     
     return dict_image_danger
 
+## Function used to draw bouding boxes onto an image, and save this image. 
+## Before calling this function, you need to get the dict_obj_detected, while calling the function detect_object()
+
+def get_bounding_box(image_path, image_items, classes, COLORS, conf_threshold, nms_threshold):
+#   apply non-max suppression
+    indices = cv2.dnn.NMSBoxes(image_items["boxes"], image_items["confidences"], conf_threshold, nms_threshold)
+    image = cv2.imread(image_path)
+
+#   go through the detections remaining
+#   after nms and draw bounding box
+    for i in indices:
+        i = i[0]
+        box = image_items["boxes"][i]
+        x = box[0]
+        y = box[1]
+        w = box[2]
+        h = box[3]
+
+        draw_bounding_box(image, image_items["class_ids"][i], image_items["confidences"][i], \
+                                    round(x), round(y), round(x+w), round(y+h), \
+                                    classes, COLORS
+                               )
+    # save output image to disk
+    cv2.imwrite(os.path.dirname(image_path) + "/output_with_bounding_box/" + os.path.basename(image_path), image)
+
+    # release resources
+    # cv2.destroyAllWindows()
+
 # function to get the output layer names 
 # in the architecture
 def get_output_layers(net):
@@ -255,7 +317,7 @@ def get_output_layers(net):
     return output_layers
 
 # function to draw bounding box on the detected object with class name
-def draw_bounding_box(img, class_id, confidence, x, y, x_plus_w, y_plus_h):
+def draw_bounding_box(img, class_id, confidence, x, y, x_plus_w, y_plus_h, classes, COLORS):
 
     label = str(classes[class_id])
 
