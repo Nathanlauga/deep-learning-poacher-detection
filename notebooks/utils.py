@@ -242,10 +242,10 @@ def detect_object(outs, list_images, Width, Height):
                 class_id = np.argmax(scores)
                 confidence = scores[class_id]
                 if confidence > 0.5:
-                    center_x = int(detection[0] * Width[i])
-                    center_y = int(detection[1] * Height[i])
-                    w = int(detection[2] * Width[i])
-                    h = int(detection[3] * Height[i])
+                    center_x = int(detection[0] * Width)
+                    center_y = int(detection[1] * Height)
+                    w = int(detection[2] * Width)
+                    h = int(detection[3] * Height)
                     x = center_x - w / 2
                     y = center_y - h / 2
                     dict_obj_detected[image_name]["class_ids"].append(class_id)
