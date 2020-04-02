@@ -2,6 +2,7 @@ import cv2
 import os
 from os.path import isfile, join
 from tqdm import tqdm
+import gc
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -38,12 +39,13 @@ def extract_frames(file, out_dir='frames', save=False, skip=30):
     video.release()
 
 def convert_frames_to_video(pathIn,pathOut,fps):
-    frame_array = []
     files = [f for f in os.listdir(pathIn) if isfile(join(pathIn, f))]
  
     #for sorting the file names properly
     files.sort(key = lambda x: x[5:-4])
  
+    out = cv2.VideoWriter(pathOut,cv2.VideoWriter_fourcc(*'DIVX'), fps, size)
+
     for i in tqdm(range(len(files))):
         filename=pathIn + files[i]
         #reading each files
@@ -51,13 +53,12 @@ def convert_frames_to_video(pathIn,pathOut,fps):
         height, width, layers = img.shape
         size = (width,height)
         #inserting the frames into an image array
-        frame_array.append(img)
- 
-    out = cv2.VideoWriter(pathOut,cv2.VideoWriter_fourcc(*'DIVX'), fps, size)
- 
-    for i in tqdm(range(len(frame_array))):
-        # writing to a image array
-        out.write(frame_array[i])
+        out.write(img)
+
+        # del img
+        gc.collect()
+
+
     out.release()
     
 def move_file(file, new_file):
