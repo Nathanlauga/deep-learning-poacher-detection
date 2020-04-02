@@ -1,11 +1,7 @@
 import cv2
 import os
-<<<<<<< HEAD
-import numpy as np
-=======
 from os.path import isfile, join
 from tqdm import tqdm
->>>>>>> 0c25fbd05056183d74a134bb38af0ab33ef2865f
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -227,12 +223,7 @@ def plot_image(image):
     plt.show()
 
     
-<<<<<<< HEAD
 def detect_object(outs, list_images, Width, Height):    
-=======
-def detect_object(outs, list_images, Width, Height):
-    
->>>>>>> 0c25fbd05056183d74a134bb38af0ab33ef2865f
     i = 0
     dict_obj_detected = {}
 
