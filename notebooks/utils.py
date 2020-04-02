@@ -1,5 +1,7 @@
 import cv2
 import os
+from os.path import isfile, join
+from tqdm import tqdm
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -25,8 +27,9 @@ def extract_frames(file, out_dir='frames', save=False, skip=30):
     success, image = video.read()
     while success:
         if save & (count % skip == 0):
-            cv2.imwrite("%s/%s_frame%d.jpg" % (out_dir, fname, count), image)
-
+            countFormated = "{0:0=5d}".format(count)
+            cv2.imwrite("%s/%s_frame%s.jpg" % (out_dir, fname, countFormated), image)
+            
         success, image = video.read()
         count += 1
 
@@ -41,19 +44,18 @@ def convert_frames_to_video(pathIn,pathOut,fps):
     #for sorting the file names properly
     files.sort(key = lambda x: x[5:-4])
  
-    for i in range(len(files)):
+    for i in tqdm(range(len(files))):
         filename=pathIn + files[i]
         #reading each files
         img = cv2.imread(filename)
         height, width, layers = img.shape
         size = (width,height)
-        print(filename)
         #inserting the frames into an image array
         frame_array.append(img)
  
     out = cv2.VideoWriter(pathOut,cv2.VideoWriter_fourcc(*'DIVX'), fps, size)
  
-    for i in range(len(frame_array)):
+    for i in tqdm(range(len(frame_array))):
         # writing to a image array
         out.write(frame_array[i])
     out.release()
