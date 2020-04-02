@@ -2,6 +2,7 @@ import cv2
 import os
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 def extract_frames(file, out_dir='frames', save=False, skip=30):
     """Extract frames from a video file.
@@ -198,7 +199,6 @@ def plot_image(image):
 
     
 def detect_object(outs, list_images, Width, Height):
-    import numpy as np
     
     i = 0
     dict_obj_detected = {}
@@ -245,6 +245,34 @@ def detect_danger(dict_obj_detected, idx_class=0):
     
     return dict_image_danger
 
+## Function used to draw bouding boxes onto an image, and save this image. 
+## Before calling this function, you need to get the dict_obj_detected, while calling the function detect_object()
+
+def get_bounding_box(image_path, image_items, classes, COLORS, conf_threshold, nms_threshold):
+#   apply non-max suppression
+    indices = cv2.dnn.NMSBoxes(image_items["boxes"], image_items["confidences"], conf_threshold, nms_threshold)
+    image = cv2.imread(image_path)
+
+#   go through the detections remaining
+#   after nms and draw bounding box
+    for i in indices:
+        i = i[0]
+        box = image_items["boxes"][i]
+        x = box[0]
+        y = box[1]
+        w = box[2]
+        h = box[3]
+
+        draw_bounding_box(image, image_items["class_ids"][i], image_items["confidences"][i], \
+                                    round(x), round(y), round(x+w), round(y+h), \
+                                    classes, COLORS
+                               )
+    # save output image to disk
+    cv2.imwrite("output_with_bounding_box/" + image_path, image)
+
+    # release resources
+    # cv2.destroyAllWindows()
+
 # function to get the output layer names 
 # in the architecture
 def get_output_layers(net):
@@ -256,7 +284,7 @@ def get_output_layers(net):
     return output_layers
 
 # function to draw bounding box on the detected object with class name
-def draw_bounding_box(img, class_id, confidence, x, y, x_plus_w, y_plus_h):
+def draw_bounding_box(img, class_id, confidence, x, y, x_plus_w, y_plus_h, classes, COLORS):
 
     label = str(classes[class_id])
 
