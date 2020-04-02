@@ -291,7 +291,7 @@ def get_bounding_box(image_path, image_items, classes, COLORS, conf_threshold, n
                                     classes, COLORS
                                )
     # save output image to disk
-    cv2.imwrite("output_with_bounding_box/" + image_path, image)
+    cv2.imwrite(os.path.dirname(image_path) + "/output_with_bounding_box/" + os.path.basename(image_path), image)
 
     # release resources
     # cv2.destroyAllWindows()
