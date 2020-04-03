@@ -224,7 +224,7 @@ def plot_image(image):
     plt.show()
 
     
-def detect_object(outs, list_images, Width, Height):    
+def detect_object(outs, list_images, Width, Height, nb_out_layer):    
     i = 0
     dict_obj_detected = {}
 
@@ -232,6 +232,14 @@ def detect_object(outs, list_images, Width, Height):
     # get the confidence, class id, bounding box params
     # and ignore weak detections (confidence < 0.5)
     for out in outs:
+        #Dimension1 = Number of Images
+        #Dimension2 = X_out_grid * Y_out_grid * nb_out_layer
+        #Dimension3 = 5 + nb_classes
+        out = out.reshape(out.shape[0],\
+                          out.shape[1]*out.shape[2]*nb_out_layer,\
+                          int(out.shape[3]/nb_out_layer)
+                         )
+        
         for image in out:
             image_name = list_images[i]
             if not image_name in dict_obj_detected:
