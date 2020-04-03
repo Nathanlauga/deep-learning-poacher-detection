@@ -38,7 +38,7 @@ def extract_frames(file, out_dir='frames', save=False, skip=30):
 
     video.release()
 
-def convert_frames_to_video(pathIn,pathOut,fps):
+def convert_frames_to_video(pathIn,pathOut,fps,size):
     files = [f for f in os.listdir(pathIn) if isfile(join(pathIn, f))]
  
     #for sorting the file names properly
@@ -50,8 +50,8 @@ def convert_frames_to_video(pathIn,pathOut,fps):
         filename=pathIn + files[i]
         #reading each files
         img = cv2.imread(filename)
-        height, width, layers = img.shape
-        size = (width,height)
+#         height, width, layers = img.shape
+#         size = (width,height)
         #inserting the frames into an image array
         out.write(img)
 
