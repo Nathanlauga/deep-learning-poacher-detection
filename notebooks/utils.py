@@ -29,7 +29,7 @@ def extract_frames(file, out_dir='frames', save=False, skip=30):
     while success:
         if save & (count % skip == 0):
             countFormated = "{0:0=5d}".format(count)
-            cv2.imwrite("%s/%s_frame%s.jpg" % (out_dir, fname, countFormated), image)
+            cv2.imwrite("%s/%s_frame_%s.jpg" % (out_dir, fname, countFormated), image)
             
         success, image = video.read()
         count += 1
@@ -145,7 +145,7 @@ def regroup_frames_same_dir(parent_dir, out_dir='/data/train'):
           (len(files_list), out_dir))
 
 
-def get_files_by_ext(dir_name, ext=['txt']):
+def get_files_by_ext(dir_name, ext=['txt'], recursive=False):
     """Retrieves all files from a directory
     using extension list
 
@@ -155,6 +155,9 @@ def get_files_by_ext(dir_name, ext=['txt']):
         Path of the directory
     ext: list
         list of valid extensions
+    recursive: boolean
+        True : Read images in sub-folders of dir_name
+        False : Read images only in the folder dir_name
     
     Returns
     -------
@@ -163,12 +166,11 @@ def get_files_by_ext(dir_name, ext=['txt']):
     """
     files_list = os.listdir(dir_name)
     files = list()
-    
     for entry in files_list:
         path = os.path.join(dir_name, entry)
-        
         if os.path.isdir(path):
-            files += get_files_by_ext(path, ext=ext)
+            if recursive:
+                files += get_files_by_ext(path, ext=ext, recursive=True)
         elif path.split('.')[-1] in ext:
             files.append(path)
 
@@ -232,13 +234,13 @@ def detect_object(outs, list_images, Width, Height, nb_out_layer):
     # get the confidence, class id, bounding box params
     # and ignore weak detections (confidence < 0.5)
     for out in outs:
-        #Dimension1 = Number of Images
-        #Dimension2 = X_out_grid * Y_out_grid * nb_out_layer
-        #Dimension3 = 5 + nb_classes
-        out = out.reshape(out.shape[0],\
-                          out.shape[1]*out.shape[2]*nb_out_layer,\
-                          int(out.shape[3]/nb_out_layer)
-                         )
+#         #Dimension1 = Number of Images
+#         #Dimension2 = X_out_grid * Y_out_grid * nb_out_layer
+#         #Dimension3 = 5 + nb_classes
+#         out = out.reshape(out.shape[0],\
+#                           out.shape[1]*out.shape[2]*nb_out_layer,\
+#                           int(out.shape[3]/nb_out_layer)
+#                          )
         
         for image in out:
             image_name = list_images[i]
