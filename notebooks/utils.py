@@ -176,7 +176,7 @@ def get_files_by_ext(dir_name, ext=['txt'], recursive=False):
 
     return files
 
-def image_to_matrix(path, resize_shape=(416,416)):
+def image_to_matrix(path, resize_shape=(416,416), skip_frames=10):
     """
     Convert an image (using path) to a numpy array 
     
@@ -196,7 +196,7 @@ def image_to_matrix(path, resize_shape=(416,416)):
     
     if type(path) == list:
         # images = [cv2.resize(cv2.imread(p), resize_shape) for p in path]
-        images = [cv2.imread(p) for p in path]
+        images = [cv2.imread(path[i]) for i in range(0, len(path), skip_frames)]
         blob = cv2.dnn.blobFromImages(images, scale, resize_shape, 
                                      (0,0,0), True, crop=False)
         
@@ -226,63 +226,67 @@ def plot_image(image):
     plt.show()
 
     
-def detect_object(outs, list_images, Width, Height, nb_out_layer):    
-    i = 0
-    dict_obj_detected = {}
-
+def detect_object(outs, list_images, Width, Height, nb_out_layer, skip_frames=10):  
+    """Detect persons.
     # for each detetion from each output layer 
     # get the confidence, class id, bounding box params
     # and ignore weak detections (confidence < 0.5)
-    for out in outs:
-#         #Dimension1 = Number of Images
-#         #Dimension2 = X_out_grid * Y_out_grid * nb_out_layer
-#         #Dimension3 = 5 + nb_classes
-#         out = out.reshape(out.shape[0],\
-#                           out.shape[1]*out.shape[2]*nb_out_layer,\
-#                           int(out.shape[3]/nb_out_layer)
-#                          )
+    """
+    i = 0
+    dict_obj_detected = {}
+     
+    # out = out.reshape(out.shape[0],\
+    #                   out.shape[1]*out.shape[2]*nb_out_layer,\
+    #                   int(out.shape[3]/nb_out_layer)
+    #                   )
+    for image in outs[2]:
         
-        for image in out:
+        if i != 0:
+            image_name = list_images[i*skip_frames]
+        else :
             image_name = list_images[i]
-            if not image_name in dict_obj_detected:
-                dict_obj_detected[image_name] = {}
-                dict_obj_detected[image_name]["class_ids"] = list()
-                dict_obj_detected[image_name]["confidences"] = list()
-                dict_obj_detected[image_name]["boxes"] = list()
-            for detection in image:
-                scores = detection[5:]
-                class_id = np.argmax(scores)
-                confidence = scores[class_id]
-                if confidence > 0.5 and class_id == 0:
-                    center_x = int(detection[0] * Width)
-                    center_y = int(detection[1] * Height)
-                    w = int(detection[2] * Width)
-                    h = int(detection[3] * Height)
-                    x = center_x - w / 2
-                    y = center_y - h / 2
-                    dict_obj_detected[image_name]["class_ids"].append(class_id)
-                    dict_obj_detected[image_name]["confidences"].append(float(confidence))
-                    dict_obj_detected[image_name]["boxes"].append([x, y, w, h])
-            i += 1
-        i = 0 
+            
+        if not image_name in dict_obj_detected:
+            dict_obj_detected[image_name] = {}
+            dict_obj_detected[image_name]["class_ids"] = list()
+            dict_obj_detected[image_name]["confidences"] = list()
+            dict_obj_detected[image_name]["boxes"] = list()
+            dict_obj_detected[image_name]["is_dangerous"] = False
+            
+        for detection in image:
+            scores = detection[5:]
+            class_id = np.argmax(scores)
+            confidence = scores[class_id]
+            if confidence > 0.5 and class_id == 0:
+                center_x = int(detection[0] * Width)
+                center_y = int(detection[1] * Height)
+                w = int(detection[2] * Width)
+                h = int(detection[3] * Height)
+                x = center_x - w / 2
+                y = center_y - h / 2
+                dict_obj_detected[image_name]["class_ids"].append(class_id)
+                dict_obj_detected[image_name]["confidences"].append(float(confidence))
+                dict_obj_detected[image_name]["boxes"].append([x, y, w, h])
+                dict_obj_detected[image_name]["is_dangerous"] = True
+        
+        # Take care about skipped frames
+        for l in range(1, skip_frames):
+            if i+l < len(list_images):
+                if i != 0:
+                    skipped_image = list_images[(i*skip_frames)+l]
+                else:
+                    skipped_image = list_images[(i*skip_frames)+l]
+                
+                if not skipped_image in dict_obj_detected:
+                    dict_obj_detected[skipped_image] = dict_obj_detected[image_name]
+        i += 1
+    i = 0 
 
     return dict_obj_detected
 
-def detect_danger(dict_obj_detected, idx_class=0):
-    
-    dict_image_danger = {}
-    
-    for image_name, row in dict_obj_detected.items():
-        if len(row["class_ids"]) != 0 and idx_class in row["class_ids"]: 
-            dict_image_danger[image_name] = True
-        else:
-            dict_image_danger[image_name] = False
-    
-    return dict_image_danger
 
 ## Function used to draw bouding boxes onto an image, and save this image. 
 ## Before calling this function, you need to get the dict_obj_detected, while calling the function detect_object()
-
 def get_bounding_box(image_path, image_items, classes, COLORS, conf_threshold, nms_threshold):
 #   apply non-max suppression
     indices = cv2.dnn.NMSBoxes(image_items["boxes"], image_items["confidences"], conf_threshold, nms_threshold)
