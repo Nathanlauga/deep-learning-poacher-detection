@@ -138,3 +138,4 @@ notebooks/YOLOV3/
 notebooks/object-detection-opencv/yolov3-tiny.h5
 notebooks/object-detection-opencv/yolov3-tiny.weights
 notebooks/object-detection-opencv/yolov3.h5
+notebooks/object-detection-opencv/yolo-drone.weights
