@@ -253,7 +253,7 @@ def detect_object(outs, list_images, Width, Height, nb_out_layer):
                 scores = detection[5:]
                 class_id = np.argmax(scores)
                 confidence = scores[class_id]
-                if confidence > 0.5:
+                if confidence > 0.5 and class_id == 0:
                     center_x = int(detection[0] * Width)
                     center_y = int(detection[1] * Height)
                     w = int(detection[2] * Width)
@@ -328,3 +328,14 @@ def draw_bounding_box(img, class_id, confidence, x, y, x_plus_w, y_plus_h, class
     cv2.rectangle(img, (x,y), (x_plus_w,y_plus_h), color, 2)
 
     cv2.putText(img, label, (x-10,y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+    
+def get_video_frame_number(image_name):
+    frame_name = image_name.split("/")[3]
+    video_number = frame_name.split(".")[0] + "." + \
+                    frame_name.split(".")[1] + "." +\
+                    frame_name.split(".")[2]
+    frame_number = frame_name.split(".")[3].split("_")[2]
+    frame_number = frame_number.lstrip("0")
+    if frame_number == '':
+        frame_number = 0 
+    return video_number, int(frame_number)
