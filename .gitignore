@@ -135,14 +135,13 @@ logs/
 notebooks/frames/
 mlflow/
 .vscode/
+notebooks/output_with_bounding_box/object-detection-opencv/
+notebooks/object-detection-opencv/
 notebooks/object-detection-opencv/yolov3.weights
 notebooks/object-detection-opencv/yolov3-tiny.h5
 notebooks/object-detection-opencv/yolov3-tiny.weights
 notebooks/object-detection-opencv/yolov3.h5
+notebooks/object-detection-opencv/yolo-drone.weights
 dataset/
-notebooks/YOLOV3/data/model/
-notebooks/YOLOV3/yymnist/
-notebooks/output_with_bounding_box/
 img/
 save/
-notebooks/object-detection-opencv/yolo-drone.weights
