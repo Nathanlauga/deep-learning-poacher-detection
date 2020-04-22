@@ -129,12 +129,19 @@ dmypy.json
 .pyre/
 
 # Other files
+./data/
 data/
+logs/
 notebooks/frames/
 mlflow/
 .vscode/
 notebooks/object-detection-opencv/yolov3.weights
-notebooks/YOLOV3/
 notebooks/object-detection-opencv/yolov3-tiny.h5
 notebooks/object-detection-opencv/yolov3-tiny.weights
 notebooks/object-detection-opencv/yolov3.h5
+dataset/
+notebooks/YOLOV3/data/model/
+notebooks/YOLOV3/yymnist/
+notebooks/output_with_bounding_box/
+img/
+save/

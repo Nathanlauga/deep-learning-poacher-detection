@@ -8,4 +8,4 @@ services:
       - 6006:6006
     volumes:
       - ../notebooks:/tf
-      - ../../../../../../../../../data:/data
+      - ../data:/data
