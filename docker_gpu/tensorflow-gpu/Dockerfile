@@ -7,5 +7,5 @@ RUN apt-get install -y libsm6 libxext6 libxrender-dev graphviz
 
 RUN pip install --upgrade pip
 
-RUN pip install pandas numpy seaborn opencv-python scikit-learn easydict tqdm
-RUN pip install mlflow==1.7.2 pydot==1.2.3
+RUN pip install pandas numpy seaborn opencv-python scikit-learn easydict tqdm pydot==1.2.3
+# RUN pip install mlflow==1.7.2 

@@ -5,26 +5,26 @@ services:
     build: 
       context: ./tensorflow-gpu
     runtime: nvidia
-    depends_on: 
-      - mlflow
-      - git
+    # depends_on: 
+    #   - mlflow
+    #   - git
     environment:
       - NVIDIA_VISIBLE_DEVICES=0
-      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      # - MLFLOW_TRACKING_URI=http://mlflow:5000
     ports:
       - 8888:8888
       - 6006:6006
     volumes:
       - ../notebooks:/tf
       - ../data:/data
-  mlflow:
-    build:
-      context: ./ml-flow-docker
-    depends_on:
-      - git
-    ports:
-      - 5000:5000
-    volumes:
-      - ../mlflow:/mlflow
-  git:
-    image: alpine/git:latest
+  # mlflow:
+  #   build:
+  #     context: ./ml-flow-docker
+  #   depends_on:
+  #     - git
+  #   ports:
+  #     - 5000:5000
+  #   volumes:
+  #     - ../mlflow:/mlflow
+  # git:
+  #   image: alpine/git:latest
